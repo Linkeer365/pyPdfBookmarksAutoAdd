@@ -144,7 +144,7 @@ while True:
     elif choice_batch=='y' and choice_oneline!='y':
         enter_idx_str=input(prompt_enterbatch)
         if not '?' in enter_idx_str:
-            print('未检测处问号,请重新输入!')
+            print('未检测出问号,请重新输入!')
             continue
         if not enter_idx_str.replace('?','').isdigit():
             print('非纯数字, 请重新输入!')
@@ -176,7 +176,25 @@ a_fd.close()
 sys.stdout=console_file
 print('\n目录文件写入完成')
 
-pdf_title='逻辑的引擎'
+pdfs_possible=[]
+pdfs_possible=0
+for each in os.listdir('.'):
+    if each.endswith('.pdf') and len(each and book_title)>3:
+        pdfs_possible.append(each)
+if len(pdfs_possible)==1:
+    pdf_title=pdfs_possible[0]
+else:
+    prompt_askPdf = '发现多个相似pdf!请选择第几个:'
+    for idx,pdf_possible in enumerate(1,pdfs_possible):
+        print('第{}个'.format(idx),pdfs_possible,sep='\t')
+    while not pdf_possible:
+        askPdf=input(prompt_askPdf)
+        if not askPdf.isdigit() and 1<=int(askPdf)<=len(pdfs_possible):
+            pdf_title=pdfs_possible[int(askPdf)-1]
+        else:
+            print('请重新输入!')
+
+
 pdf_in_path= 'D:/{}.pdf'.format(pdf_title)
 pdf_rd=PyPDF2.PdfFileReader(pdf_in_path)
 pdf_wt=PyPDF2.PdfFileWriter()
@@ -194,10 +212,11 @@ pages=[]
 for pageNum in range(0,pdf_pagecnt):
     pages.append(pdf_rd.getPage(pageNum))
 
+offset=5 # 单独的一个临时变量
 for page in pages:
     pdf_wt.addPage(page)
 for title,idx in titles_indices:
-    pdf_wt.addBookmark(title,int(idx)-1) # 注意, 在pdf_wt眼中, pdf是从第0页开始的, 但是我们输入还是照样输入就对了, 这边处理一下就对了!
+    pdf_wt.addBookmark(title,int(idx)+offset-1) # 注意, 在pdf_wt眼中, pdf是从第0页开始的, 但是我们输入还是照样输入就对了, 这边处理一下就对了!
 
 pdf_out_path=pdf_in_path.split('.pdf')[0]+'_完成添加.pdf' # [in] a='yhssb.pdf'; a.split('.pdf') [out]:['yhssb', '']
 
